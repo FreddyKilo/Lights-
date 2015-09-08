@@ -3,10 +3,6 @@
 String MESSAGE = "";
 String LIGHTS_ON = "1";
 String LIGHTS_OFF = "0";
-String PIN = "1234";           // PIN to enter upon bluetooth pairing
-String NAME = "Lights!";       // Name of device
-// int LED = 4;                // Output pin lights
-// int IR_SENSOR = 2;          // Input pin IR sensor
 unsigned int AUTO_TIMER = 300; // Seconds until lights turn off after motion (5 minutes)
 unsigned long START_TIME = 0;
 unsigned long OFF_SWITCH_TIMER;
@@ -24,12 +20,14 @@ void setup() {
   Uncomment code below to set friendly
   name and PIN upon boot
   */
-//  delay(500);
-//  mySerial.print("AT+NAME" + NAME);
-//  delay(1000);
-//  mySerial.print("AT+PIN" + PIN);
-//  delay(1000);
-//  mySerial.flush();
+  // String PIN = "1234"; // The PIN to enter upon bluetooth pairing
+  // String NAME = "Lights!";
+  // delay(500);
+  // mySerial.print("AT+NAME" + NAME);
+  // delay(1000);
+  // mySerial.print("AT+PIN" + PIN);
+  // delay(1000);
+  // mySerial.flush();
 }
 
 void loop() {
@@ -41,15 +39,6 @@ void loop() {
   }
   MESSAGE = "";
   if(digitalRead(2) && SWITCHED_ON == false){
-    /*
-    The logic here will trigger on the light switch via motion sensor only if the time
-    between now and turning it off manually is greater than 60 minutes. The first "or"
-    is needed to divide millis() down to less than the max int type value, which is 65,536
-    (seconds) unsigned, which is also only 18.2 hours. If not divided, the int type value
-    would overflow before the value that millis() returns, which overflows after about
-    49.7 days. The second "or" is needed to run the logic even if the time from program
-    start is less than 100 seconds.
-    */
     if(START_TIME + OFF_SWITCH_TIMER < millis()/1000){
       delay(20);
       irSensor();
@@ -68,7 +57,6 @@ void manualSwitch(){
       OFF_SWITCH_TIMER = 60 * 60; // This value is set in seconds, in this case, 60 minutes
       MESSAGE = "";
       fadeOut();
-      mySerial.flush();
     }
   }
 }
@@ -91,6 +79,8 @@ void irSensor(){
 }
 
 void fadeIn() {
+  mySerial.println(LIGHTS_ON);
+  mySerial.flush();
   for (int pwm = 0; pwm <= 255; pwm++){
     analogWrite(4, pwm);
     delay(4);
@@ -100,6 +90,7 @@ void fadeIn() {
 
 void fadeOut() {
   mySerial.println(LIGHTS_OFF);
+  mySerial.flush();
   for (int pwm = 255; pwm > -1; pwm--){
     analogWrite(4, pwm);
     delay(4);
@@ -108,18 +99,5 @@ void fadeOut() {
 }
 
 void startUp(){
-  mySerial.println(LIGHTS_ON);
-  mySerial.flush();
-  // Uncomment for flicker effect on startup
-//  onOff(35, 100);
-//  onOff(35, 300);
-//  onOff(40, 300);
   fadeIn();
 }
-
-//void onOff(int on, int off) {
-//  digitalWrite(4, HIGH);
-//  delay(on);
-//  digitalWrite(4, LOW);
-//  delay(off);
-//}
