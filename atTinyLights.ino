@@ -1,3 +1,10 @@
+/*
+This code is to be used with an Adafruit Trinket, however, the pinout can be
+modified to fit any Arduino, probably :)
+The circuit also includes an IR sensor, HM-06 bluetooth module, and a
+photoresistor.
+*/
+
 #include <SoftwareSerial.h>
 
 String MESSAGE = "";
